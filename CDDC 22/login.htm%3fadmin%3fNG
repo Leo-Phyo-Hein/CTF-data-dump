@@ -1,0 +1,294 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>Shock&Innovation!! netis setup</title>
+<meta http-equiv="X-UA-Compatible" content="IE=9" >
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link href="css/style_netis_v1.8.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript" src="util_gw.js"> </script>
+<script type="text/javascript" src="md5.js"> </script>
+<script type="text/javascript" src="util_intro.js"> </script>
+<script language="javascript">
+/*
+login.htm
+*/
+function getCookie(cName)
+{
+  cName = cName + '=';
+  var cookieData = document.cookie;
+  var start = cookieData.indexOf(cName);
+  var cValue = '';
+  if(start != -1) {
+    start += cName.length;
+    var end = cookieData.indexOf(';', start);
+    if(end == -1)end = cookieData.length;
+    cValue = cookieData.substring(start, end);
+  }
+  return unescape(cValue);
+}
+
+var model_name = "MEX01";
+var cookie_mac = "CFD5";
+var cookie_id = model_name + "_" + cookie_mac + "_ID";
+
+var code = getCookie(cookie_id);
+var login = code.substring(0, 1);
+var capt = code.substring(1, 33);
+
+var pc_ip = "";
+
+var captchr = "0";
+var logout_time = "10";
+
+function show_captcha()
+{
+  var content = "";
+  content += "<img src=\"/var/CAPTCHA_" + pc_ip+".jpg\" style=\"max-width: 100px; height: 30px;\" id='ID_PIC'>";
+  document.getElementById("captcha").innerHTML = content;
+}
+
+function get_data_send()
+{
+  var xmlhttp;
+  if(window.XMLHttpRequest)
+  {
+    xmlhttp=new XMLHttpRequest();
+  }
+  else
+  {
+    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  xmlhttp.open("GET","login.htm",true);
+  xmlhttp.send();
+  xmlhttp.onreadystatechange=function()
+  {
+    if (xmlhttp.readyState==4 && xmlhttp.status==200)
+    {
+      code = getCookie(cookie_id);
+      login = code.substring(0, 1);
+      capt = code.substring(1, 33);
+      var DIV_PIC = document.getElementById("ID_PIC");
+      DIV_PIC.src +=  "?time="+ new Date();
+    }
+  }       
+}
+
+function onclick_reload()
+{
+  var DIV_PIC = document.getElementById("ID_PIC");
+  DIV_PIC.src = "";
+  //get_data_send("", "");
+  setTimeout('get_data_send()', 100);
+  show_captcha();
+}
+
+function init()
+{
+  var href_parent = parent.window.location.href;
+  var href_parent_data = href_parent.split("?");
+
+  var href_window = window.location.href;
+  var href_window_data = href_window.split("?");
+
+  if(href_parent_data[0] != href_window_data[0])
+  {
+    var opt = "";
+    if(href_parent_data.length >= 3)
+    {
+      opt = "?" + href_parent_data[2] + "?" + href_parent_data[3];
+    }
+    //var hostip = parent.window.location.host;
+    //var ip_port = hostip.split(":");
+    //if(ip_port.length == 2) http = "https://";
+    //else http = "http://";
+    var is_ssl_support = "1"*1;
+    var https_enabled = "0"*1;
+    var is_lan = "0"*1;
+    if(is_ssl_support == 0 ||
+		   (is_ssl_support == 1 && https_enabled == 0) ||
+		   is_lan == 1) http = "http://";
+    else http = "https://";
+    parent.window.location.href = http + parent.window.location.host +"/login.htm" + opt;
+    return;
+  }
+  if(code.length <=0)
+  {
+    alert("Cookie 설정이 되지 않습니다. 설정후 이용해 주세요 ");
+    return;
+  }
+  if(href_parent_data.length >= 2)
+  {
+    document.login.login_name_id.value = href_parent_data[1];
+    if(href_parent_data.length >= 3)
+    {
+      if(href_parent_data[2] == "TI")
+      {
+        alert(logout_time + "분이 경과하여 자동 로그아웃 되었습니다."); 
+      }
+      else if(href_parent_data[2] == "NG")
+      {
+        alert("아이디 또는 패스워드가 잘못되었습니다. "); 
+      }
+      else if(href_parent_data[2] == "CG")
+      {
+        alert("캡차코드 입력이 잘못되었습니다."); 
+      }
+      else if(href_parent_data[2] == "MG")
+      {
+        alert("최대 인원을 초과 하였습니다. 잠시후에 다시 시도해주세요."); 
+      }
+      else if(href_parent_data[2] == "TG")
+      {
+        alert("로그인을 5회 실패하여 " + logout_time + "분 동안 로그인할 수 없습니다."); 
+      }
+    }
+  }
+  show_captcha();
+  if(login == "0") {
+  	document.getElementById('id_pw').type = 'text';
+    document.login.login_name_id.value = "아이디를 설정해 주세요.";
+    document.login.name_pw.value = "비밀번호를 설정해 주세요.";
+    disableTextField(document.login.login_name_id);
+    disableTextField(document.login.name_pw);
+    document.login.name_captchr.focus();
+  }
+  if(captchr == "1")
+  {
+    document.getElementById("captchr_01").style.visibility = "hidden";
+    document.getElementById("captchr_01").style.display = "none";
+    document.getElementById("captchr_02").style.visibility = "hidden";
+    document.getElementById("captchr_02").style.display = "none";
+  }
+}
+
+function onclick_login()
+{
+  if(login == 1)
+  {
+    if(document.login.login_name_id.value == "")
+    {
+      alert("사용자 아이디를 입력해주세요");
+      return;
+    }
+    if(document.login.name_pw.value == "")
+    {
+      alert("비밀번호를 입력해주세요.");
+      return;
+    }
+        
+    var str = hex_md5(document.login.name_pw.value);
+    document.login.name_pw.value = "";
+    document.login.name_md5.value = str;
+  }
+  if(captchr == "0") {
+    if(document.login.name_captchr.value == "")
+    {
+      alert("캡차코드를 입력해주세요.");
+      return;
+    }
+  }
+  document.login.submit();
+}
+
+function inputenter()
+{
+  if(event.keyCode == 13) {
+    onclick_login();       
+    return;
+  }
+}
+</script>
+</head>
+<body onload="init()" style="background:#004282;">
+
+<form action=/boafrm/formLogin method=POST name="login">
+
+<div id="div_default_intro">
+	<div id="top">
+		<div class="toplogo">
+			<div class="left"><img src="./img/toplogo_netis.png"></div>
+		</div>
+	</div>
+
+	<div id="contents_intro">
+
+		<div class="section odd">
+			<div class="icon"><img src="img/loginin.png"></div>
+			<div class="contents">
+				<div class="title">로그인</div>
+                                        
+				<div id="ID_LOGIN">                                     
+					<table class="tbl">
+						<tr>
+							<th>아이디</th>
+							<td><input type="text" class="w100px" name="login_name_id"  tabindex="1"></td>
+						</tr>
+						<tr>
+							<th>비밀번호</th>
+							<td><input type="password" class="w100px" name="name_pw"  id="id_pw" tabindex="2" onkeydown="javascript:inputenter();"></td>
+						</tr>
+					</table>
+				</div>
+                                                                
+				<table class="tbl_type05">                                                                                      
+					<tr id="captchr_01">
+						<td class="data" colspan=3><span style="color:#990000;">관리자 계정 설정을 하지 않으면 보안상 취약점이 발생되어 문제가
+							발생될 수 있습니다.</span> <br> 아래 이미지를 보이는 대로 입력해주세요.
+						</td>
+					</tr>                                           
+					<tr id="captchr_02">
+						<td class="item">
+							<div id="captcha"></div>
+						</td>
+						<td>
+							<input type="text" class="w100px" name="name_captchr" maxlength="5" tabindex="3" onkeydown="javascript:inputenter();">
+						</td>
+						<td>
+							<input type="button" class="button2" value="새로고침" name="name_reload" onclick="onclick_reload()">
+						</td>
+					</tr>
+
+					<tr>
+						<td class="data" colspan=3>
+							<div id="btn">
+								<center>
+									<div class="btn_type01_index" id="save" onclick="onclick_login();">
+									로그인
+									</div>
+								</center>
+							</div>
+						</td>
+					</tr>
+				</table>
+        <font class="txt_tip_blue01">tip.</font> <font class="txt_tip01">
+           관리자계정에서 등록 한 아이디와 비밀번호를 입력하여 로그인 합니다.아이디와 비밀번호 분실시에는 제품 뒷면의 초기화 버튼을 5초간 눌러 초기화 하신 뒤에 다시 접속할 수 있습니다.<br>
+        </font>
+      </div>
+    </div>  <!-- odd --> 
+
+  </div> <!--  content --> 
+
+  <div>&nbsp;</div>
+
+</div>
+
+<div id="footer">
+	<a href="http://www.netu.co.kr" target="_blank">http://www.netu.co.kr</a> | 제품문의 <a href="mailto:help@netu.co.kr">help@netu.co.kr</a> | 고객센터 1877-7377
+</div>
+
+<map name="img_top">
+        <area shape="rect" coords="400, 0, 490, 40" href="home.htm">
+</map>
+
+<input type="hidden" value="1" name="name_introp">
+<input type="hidden" value="" name="name_md5">
+<input type="hidden" value="pc" name="name_pc_mobile">
+<input type="hidden" value="" name="name_mac_clone">
+<input type="hidden" value="" name="type">
+
+</form>
+</body>
+</html>

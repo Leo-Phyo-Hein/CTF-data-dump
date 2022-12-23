@@ -1,0 +1,50 @@
+function part2(str2) {
+    if (str2.length === 4) {
+        console.log(str2);
+        if (
+            str2.charCodeAt(0) +
+            2 * str2.charCodeAt(1) -
+            3 * str2.charCodeAt(2) +
+            4 * str2.charCodeAt(3) ===
+            354 &&
+            2 * str2.charCodeAt(0) +
+            2 * str2.charCodeAt(1) -
+            2 * str2.charCodeAt(2) +
+            3 * str2.charCodeAt(3) ===
+            383 &&
+            3 * str2.charCodeAt(0) -
+            2 * str2.charCodeAt(1) -
+            4 * str2.charCodeAt(2) +
+            str2.charCodeAt(3) ===
+            -106 &&
+            2 * Math.pow(str2.charCodeAt(0), 3) +
+            3 * Math.pow(str2.charCodeAt(1), 2) -
+            2 * Math.pow(str2.charCodeAt(2), 3) -
+            4 * Math.pow(str2.charCodeAt(3), 2) ===
+            59284
+        )
+            return true;
+
+    }
+}
+
+for (w = 32; w <= 127; w++) {
+    for (x = 32; x <= 127; x++) {
+        for (y = 32; y <= 127; y++) {
+            for (z = 32; z <= 127; z++) {
+                if (part2(String.fromCharCode(w, x, y, z)) == true) {
+                    console.log(w);
+                    console.log(x);
+                    console.log(y);
+                    console.log(z);
+                    //while (1) { }
+                }
+            }
+        }
+    }
+}
+//Math.floor(Math.random() * 127) + 32;
+
+
+
+$e = '
